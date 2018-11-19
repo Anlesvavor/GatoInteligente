@@ -1,10 +1,11 @@
 package modelos;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class Reja {
+public class Reja implements Serializable {
     /*
     private EnumEstado noroeste;
     private EnumEstado norte;
@@ -127,15 +128,12 @@ public class Reja {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()){
+            return false;
+        }
         Reja reja = (Reja) o;
-        return this.estados.equals(reja);
-        //return Arrays.equals(estados, reja.estados);
-    }
+        return Arrays.deepEquals(reja.getEstados(), this.getEstados());
 
-    @Override
-    public int hashCode() {
-        return Arrays.hashCode(estados);
     }
 
     public EnumEstado[][] getEstados() {

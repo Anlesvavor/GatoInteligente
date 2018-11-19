@@ -9,66 +9,65 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static modelos.EnumEstado.X;
+
 public class GatoCLI {
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        Reja reja = new Reja();
+
         EnumGanador ganador = EnumGanador.POR_DEFINIR;
         EnumTurno turno = Math.random() * 2 > 1 ? EnumTurno.JUGADOR : EnumTurno.COMPUTADORA;
         EnumEstado simbolo = Math.random() * 2 > 1 ? EnumEstado.O : EnumEstado.X;
-        NodeGato siguienteNodo = new NodeGato(new Jugada(turno, ganador, simbolo, reja));
-        NodeGato tree = siguienteNodo;
+        NodeGato raiz = popularArbol(200);
 
 
         for (int i = 0; i < 5; i++) {
-            while(!reja.lleno() && ganador.equals(EnumGanador.POR_DEFINIR)){
-                reja.mostrar();
+            NodeGato anterior = raiz;
+            NodeGato tmp;
+            Reja rej = new Reja();
+            while(!rej.lleno() && ganador.equals(EnumGanador.POR_DEFINIR)){
+                rej.mostrar();
                 if (turno.equals(EnumTurno.JUGADOR)){
-                    reja = entradaJugador(reja, simbolo);
+                    rej = entradaJugador(rej, simbolo);
+                } else if (raiz.breadthRejaSearch(rej).getNode().depthGanadorSearch(simbolo).getNode() != null
+                        && raiz.breadthRejaSearch(rej).getNode().depthGanadorSearch(simbolo).getRoute().size() > 2) {
+                    rej = raiz.breadthRejaSearch(rej).getNode().depthGanadorSearch(simbolo).getRoute().get(1).getData().getReja();
                 } else {
-                    SearchRouteGato ruta = siguienteNodo.depthGanadorSearch(simbolo);
-                    if(siguienteNodo.depthGanadorSearch(simbolo).getRoute().isEmpty()){
-                        Boolean flag = Boolean.FALSE;
-                        do {
-                            Integer n1 = (int) Math.floor(Math.random() * 3);
-                            Integer n2 = (int) Math.floor(Math.random() * 3);
-                            for(String s : reja.espaciosLibres()){
-                                if (String.format("%s%s",n1, n2).equals(s)){
-                                    flag = Boolean.TRUE;
-                                    reja.ingresar(n1, n2, simbolo);
-                                    break;
-                                }
-                            }
-                        }while(flag.equals(Boolean.FALSE));
-                        siguienteNodo = siguienteNodo.addChild(new NodeGato(new Jugada(turno, ganador, simbolo, reja)));
+                    movimientoAleatorioComputadora(simbolo, rej);
+                    /*
+                    Reja r2 = (Reja) DeepCopy.copy(r);
+
+                    tmp = new NodeGato(new Jugada(EnumTurno.COMPUTADORA, EnumGanador.POR_DEFINIR, simbolo, r2));
+                    SearchRouteGato ruta = anterior.breadthRejaSearch(r2);
+
+                    if(ruta.getNode().getLevel().equals(-1)){ //Se cumple la condición, OK.
+                        anterior.addChild(tmp);
+                        anterior = tmp;
+                    }else if(ruta.getNode() != null){
+                        anterior = ruta.getNode();
                     } else {
-                        for (Integer j = 0; j < ruta.getRoute().size() - 1; j++) {
-                            if(ruta.getRoute().get(j).getData().getReja().equals(reja)){
-                                reja = ruta.getRoute().get(j + 1).getData().getReja();
-                                siguienteNodo = siguienteNodo.depthSearch(ruta.getRoute().get(j + 1).getData()).getNode();
-                            }
-                        }
+                        //anterior = tmp;
                     }
+                    */
                 }
-                if (!reja.veredicto().equals(EnumEstado.VACIO)){
-                    System.out.println(String.format("El ganador es %s jugando con %s !", turno, reja.veredicto()));
+                if (!rej.veredicto().equals(EnumEstado.VACIO)){
+                    System.out.println(String.format("El ganador es %s jugando con %s !", turno, rej.veredicto()));
                     ganador = turno.equals(EnumTurno.JUGADOR) ? EnumGanador.JUGADOR : EnumGanador.COMPUTADORA;
-                }else if(reja.lleno()){
+                }else if(rej.lleno()){
                     System.out.println("Empate");
                     ganador = EnumGanador.EMPATE;
                 }
                 turno = turno.equals(EnumTurno.COMPUTADORA) ? EnumTurno.JUGADOR : EnumTurno.COMPUTADORA;
                 simbolo = simbolo.equals(EnumEstado.O) ? EnumEstado.X : EnumEstado.O;
             }
-            reja.mostrar();
-            System.out.println(tree.toStringNice());
-            reja = new Reja();
+            //r.mostrar();
+
             ganador = EnumGanador.POR_DEFINIR;
             turno = Math.random() * 2 > 1 ? EnumTurno.JUGADOR : EnumTurno.COMPUTADORA;
             simbolo = Math.random() * 2 > 1 ? EnumEstado.O : EnumEstado.X;
-            siguienteNodo = tree;
+            //siguienteNodo = raiz;
         }
 
 
@@ -94,34 +93,66 @@ public class GatoCLI {
     }
 */
 
-    public static void popularArbol(){
-        NodeGato raiz = new NodeGato(new Jugada());
-        NodeGato puntero = raiz;
-        Reja r;
-        EnumEstado simbolo = Math.random() * 2 > 1 ? EnumEstado.O : EnumEstado.X;
+    public static NodeGato popularArbol(Integer iteraciones){
 
-        for (int i = 0; i < 1000; i++) {
-            r = new Reja();
-            while (!r.lleno()) {
-                Boolean flag = Boolean.FALSE;
-                do {
-                    Integer n1 = (int) Math.floor(Math.random() * 3);
-                    Integer n2 = (int) Math.floor(Math.random() * 3);
-                    for (String s : r.espaciosLibres()) {
-                        if (String.format("%s%s", n1, n2).equals(s)) {
-                            flag = Boolean.TRUE;
-                            r.ingresar(n1, n2, simbolo);
+        NodeGato raiz = new NodeGato(new Jugada(null, EnumGanador.POR_DEFINIR, EnumEstado.VACIO, new Reja()));
 
-                            break;
-                        }
-                    }
-                } while (flag.equals(Boolean.FALSE));
+        for (int i = 0; i < Math.abs(iteraciones); i++) {
+            EnumGanador ganador = EnumGanador.POR_DEFINIR;
+            EnumTurno turno = Math.random() * 2 > 1 ? EnumTurno.JUGADOR : EnumTurno.COMPUTADORA;
+            EnumEstado simbolo = Math.random() * 2 > 1 ? EnumEstado.O : EnumEstado.X;
+
+            NodeGato anterior = raiz;
+            NodeGato tmp;
+            Reja r = new Reja();
+            while (!r.lleno() && ganador.equals(EnumGanador.POR_DEFINIR)) {
+                movimientoAleatorioComputadora(simbolo, r);
+
+                Reja r2 = (Reja) DeepCopy.copy(r);
+
+                if (!r2.veredicto().equals(EnumEstado.VACIO)){
+                    System.out.println(String.format("El ganador es %s jugando con %s !", turno, r2.veredicto()));
+                    ganador = turno.equals(EnumTurno.JUGADOR) ? EnumGanador.JUGADOR : EnumGanador.COMPUTADORA;
+
+                }else if(r2.lleno()){
+                    System.out.println("Empate");
+                    ganador = EnumGanador.EMPATE;
+                }
+
+                tmp = new NodeGato(new Jugada(turno, ganador, simbolo, r2));
+                SearchRouteGato ruta = anterior.breadthRejaSearch(r2);
+
+                if(ruta.getNode().getLevel().equals(-1)){ //Se cumple la condición, OK.
+                    anterior.addChild(tmp);
+                    anterior = tmp;
+                }else if(ruta.getNode() != null){
+                    anterior = ruta.getNode();
+                } else {
+                    //anterior = tmp;
+                }
+
+                turno = turno.equals(EnumTurno.COMPUTADORA) ? EnumTurno.JUGADOR : EnumTurno.COMPUTADORA;
                 simbolo = simbolo.equals(EnumEstado.O) ? EnumEstado.X : EnumEstado.O;
-                puntero = puntero.addChild(new NodeGato(new Jugada(EnumTurno.COMPUTADORA, EnumGanador.EMPATE, simbolo, r)));
             }
-            puntero = raiz;
         }
+        return raiz;
     }
+
+    public static void movimientoAleatorioComputadora(EnumEstado simbolo, Reja r) {
+        Boolean flag = Boolean.FALSE;
+        do {
+            Integer n1 = (int) Math.floor(Math.random() * 3);
+            Integer n2 = (int) Math.floor(Math.random() * 3);
+            for (String s : r.espaciosLibres()) {
+                if (String.format("%s%s", n1, n2).equals(s)) {
+                    flag = Boolean.TRUE;
+                    r.ingresar(n1, n2, simbolo);
+                    break;
+                }
+            }
+        } while (flag.equals(Boolean.FALSE));
+    }
+
 
     public static Reja entradaJugador(Reja reja, EnumEstado simb) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
