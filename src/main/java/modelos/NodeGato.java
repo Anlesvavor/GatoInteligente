@@ -3,10 +3,11 @@ package modelos;
 import arboleos.SearchMethods;
 import arboleos.SearchRoute;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NodeGato implements SearchMethodsGato {
+public class NodeGato implements SearchMethodsGato, Serializable {
 
     private Jugada data;
     private List<NodeGato> children = new ArrayList<>();
@@ -100,8 +101,39 @@ public class NodeGato implements SearchMethodsGato {
         return null;
     }
 
+    @Override
+    public SearchRouteGato breadthGanadorSearch() {
+        return null;
+    }
+
 
     public SearchRouteGato depthGanadorSearch(EnumEstado estado) {
+        NodeGato copy = new NodeGato(this);
+        ArrayList<NodeGato> l = new ArrayList<>();
+        ArrayList<NodeGato> v = new ArrayList<>();
+        l.add(0, copy);
+        NodeGato n;
+        do {
+            if (l.isEmpty()) {
+                v.add(l.get(0));
+                if (!l.get(0).getData().getGanador().equals(EnumGanador.POR_DEFINIR)
+                        && (l.get(0).getData().getSimbolo().equals(estado)))
+                    return new SearchRouteGato(l.get(0), v);
+            } else {
+                n = l.remove(0);
+                v.add(n);
+                if (!n.getData().getGanador().equals(EnumGanador.POR_DEFINIR)
+                        && (n.getData().getSimbolo().equals(estado))) {
+                    return new SearchRouteGato(n, v);
+                } else {
+                    if (!n.getChildren().isEmpty()) l.addAll(0, n.getChildren());
+                }
+            }
+        } while (!l.isEmpty());
+        return new SearchRouteGato(this, new ArrayList<>());
+    }
+
+    public SearchRouteGato depthCompetitivoSearch(EnumEstado estado) {
         NodeGato copy = new NodeGato(this);
         ArrayList<NodeGato> l = new ArrayList<>();
         ArrayList<NodeGato> v = new ArrayList<>();
@@ -127,8 +159,7 @@ public class NodeGato implements SearchMethodsGato {
         return new SearchRouteGato(this, new ArrayList<>());
     }
 
-    @Override
-    public SearchRouteGato breadthGanadorSearch() {
+    public SearchRouteGato breadthGanadorSearch(EnumEstado estado) {
         NodeGato copy = new NodeGato(this);
         ArrayList<NodeGato> l = new ArrayList<>();
         ArrayList<NodeGato> v = new ArrayList<>();
@@ -137,11 +168,40 @@ public class NodeGato implements SearchMethodsGato {
         do {
             if (l.isEmpty()) {
                 v.add(l.get(0));
-                if (l.get(0).getData().getGanador().equals(EnumGanador.COMPUTADORA)) return new SearchRouteGato(l.get(0), v);
+                if (l.get(0).getData().getGanador().equals(EnumGanador.POR_DEFINIR)
+                        && (l.get(0).getData().getSimbolo().equals(estado)))
+                    return new SearchRouteGato(l.get(0), v);
             } else {
                 n = l.remove(0);
                 v.add(n);
-                if (n.getData().equals(EnumGanador.COMPUTADORA)) {
+                if (!n.getData().getGanador().equals(EnumGanador.POR_DEFINIR)
+                        && (n.getData().getSimbolo().equals(estado))) {
+                    return new SearchRouteGato(n, v);
+                } else {
+                    if (!n.getChildren().isEmpty()) l.addAll(l.size(), n.getChildren());
+                }
+            }
+        } while (!l.isEmpty());
+        return new SearchRouteGato(new NodeGato(), new ArrayList<>());
+    }
+
+    public SearchRouteGato breadthCompetitivoSearch(EnumEstado estado) {
+        NodeGato copy = new NodeGato(this);
+        ArrayList<NodeGato> l = new ArrayList<>();
+        ArrayList<NodeGato> v = new ArrayList<>();
+        l.add(0, copy);
+        NodeGato n;
+        do {
+            if (l.isEmpty()) {
+                v.add(l.get(0));
+                if (l.get(0).getData().getGanador().equals(EnumGanador.POR_DEFINIR)
+                        && (l.get(0).getData().getSimbolo().equals(estado) || l.get(0).getData().getGanador().equals(EnumGanador.EMPATE)))
+                    return new SearchRouteGato(l.get(0), v);
+            } else {
+                n = l.remove(0);
+                v.add(n);
+                if (!n.getData().getGanador().equals(EnumGanador.POR_DEFINIR)
+                        && (n.getData().getSimbolo().equals(estado) || n.getData().getGanador().equals(EnumGanador.EMPATE))) {
                     return new SearchRouteGato(n, v);
                 } else {
                     if (!n.getChildren().isEmpty()) l.addAll(l.size(), n.getChildren());
@@ -199,6 +259,9 @@ public class NodeGato implements SearchMethodsGato {
         return new SearchRouteGato(new NodeGato(), new ArrayList<>());
     }
 
+    public SearchRouteGato mejorMovimientos(){
+        return null;
+    }
 
     public List<NodeGato> getChildren() {
         return children;

@@ -2,9 +2,10 @@ package modelos;
 
 import arboleos.Node;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class SearchRouteGato {
+public class SearchRouteGato implements Serializable {
     private NodeGato node;
     private ArrayList<NodeGato> route;
 
@@ -30,6 +31,20 @@ public class SearchRouteGato {
 
     public void setRoute(ArrayList<NodeGato> route) {
         this.route = route;
+    }
+    
+    public SearchRouteGato rutaARaiz() {
+        ArrayList<NodeGato> ruta = new ArrayList<>();
+        NodeGato tmp = this.getNode();
+        while(true){
+            if (tmp.getParent() != null){
+                ruta.add(0, (NodeGato) DeepCopy.copy(tmp));
+                tmp = tmp.getParent();
+            } else {
+                break;
+            }
+        }
+        return new SearchRouteGato(this.node, ruta);
     }
 
 }

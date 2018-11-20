@@ -20,7 +20,7 @@ public class GatoCLI {
         EnumGanador ganador = EnumGanador.POR_DEFINIR;
         EnumTurno turno = Math.random() * 2 > 1 ? EnumTurno.JUGADOR : EnumTurno.COMPUTADORA;
         EnumEstado simbolo = Math.random() * 2 > 1 ? EnumEstado.O : EnumEstado.X;
-        NodeGato raiz = popularArbol(200);
+        NodeGato raiz = popularArbol(2000);
 
 
         for (int i = 0; i < 5; i++) {
@@ -29,11 +29,13 @@ public class GatoCLI {
             Reja rej = new Reja();
             while(!rej.lleno() && ganador.equals(EnumGanador.POR_DEFINIR)){
                 rej.mostrar();
+                Reja rej2 = (Reja) DeepCopy.copy(rej);
                 if (turno.equals(EnumTurno.JUGADOR)){
-                    rej = entradaJugador(rej, simbolo);
-                } else if (raiz.breadthRejaSearch(rej).getNode().depthGanadorSearch(simbolo).getNode() != null
-                        && raiz.breadthRejaSearch(rej).getNode().depthGanadorSearch(simbolo).getRoute().size() > 2) {
-                    rej = raiz.breadthRejaSearch(rej).getNode().depthGanadorSearch(simbolo).getRoute().get(1).getData().getReja();
+                    entradaJugador(rej, simbolo);
+                } else if (raiz.breadthRejaSearch(rej2).getNode().depthGanadorSearch(simbolo).getNode() != null
+                        && raiz.breadthRejaSearch(rej2).getNode().depthGanadorSearch(simbolo).getRoute().size() > 2) {
+                    rej = raiz.breadthRejaSearch(rej2).getNode().depthGanadorSearch(simbolo).getRoute().get(1).getData().getReja();
+
                 } else {
                     movimientoAleatorioComputadora(simbolo, rej);
                     /*
@@ -111,11 +113,11 @@ public class GatoCLI {
                 Reja r2 = (Reja) DeepCopy.copy(r);
 
                 if (!r2.veredicto().equals(EnumEstado.VACIO)){
-                    System.out.println(String.format("El ganador es %s jugando con %s !", turno, r2.veredicto()));
+                    //System.out.println(String.format("El ganador es %s jugando con %s !", turno, r2.veredicto()));
                     ganador = turno.equals(EnumTurno.JUGADOR) ? EnumGanador.JUGADOR : EnumGanador.COMPUTADORA;
 
                 }else if(r2.lleno()){
-                    System.out.println("Empate");
+                   // System.out.println("Empate");
                     ganador = EnumGanador.EMPATE;
                 }
 

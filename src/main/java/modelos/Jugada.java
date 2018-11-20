@@ -1,6 +1,8 @@
 package modelos;
 
-public class Jugada {
+import java.io.Serializable;
+
+public class Jugada implements Serializable {
     private EnumTurno turno;
     private EnumGanador ganador;
     private EnumEstado simbolo;
