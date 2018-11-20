@@ -211,7 +211,7 @@ public class Test {
 
     @org.junit.jupiter.api.Test
     public void popularArbolTest() {
-        NodeGato raiz = GatoCLI.popularArbol(1000000);
+        NodeGato raiz = GatoCLI.popularArbol(200000);
         EnumEstado simbolo = Math.random() * 2 > 1 ? EnumEstado.O : X;
 
         Reja r = new Reja();
@@ -220,7 +220,7 @@ public class Test {
         System.out.println();
 
         System.out.println("================================================================================");
-        if (raiz.breadthRejaSearch(r).getNode().depthGanadorSearch(simbolo).getNode() != null) {
+        if (raiz.breadthRejaSearch(r).getNode().depthCompetitivoSearch(simbolo).getNode() != null) {
             //System.out.println(raiz.breadthRejaSearch(raiz.breadthRejaSearch(r).getNode().breadthGanadorSearch(simbolo).getNode().getData().getReja()).getRoute().size());
             //raiz.breadthRejaSearch(raiz.breadthRejaSearch(new Reja()).getNode().depthGanadorSearch(simbolo).getNode().getData().getReja()).getRoute().forEach(nodeGato -> System.out.println(nodeGato.getData().getReja()));
             //raiz.breadthRejaSearch(r).getNode().breadthGanadorSearch(simbolo).getRoute().forEach(nodeGato -> System.out.println(nodeGato.getData().getReja()));
@@ -240,7 +240,6 @@ public class Test {
                 System.out.println();
                 simbolo = simbolo.equals(EnumEstado.O) ? X : EnumEstado.O;
             }
-
         }
     }
 }

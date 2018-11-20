@@ -31,11 +31,10 @@ public class GatoCLI {
                 rej.mostrar();
                 Reja rej2 = (Reja) DeepCopy.copy(rej);
                 if (turno.equals(EnumTurno.JUGADOR)){
-                    entradaJugador(rej, simbolo);
+                    entradaJugador(rej2, simbolo);
                 } else if (raiz.breadthRejaSearch(rej2).getNode().depthGanadorSearch(simbolo).getNode() != null
                         && raiz.breadthRejaSearch(rej2).getNode().depthGanadorSearch(simbolo).getRoute().size() > 2) {
-                    rej = raiz.breadthRejaSearch(rej2).getNode().depthGanadorSearch(simbolo).getRoute().get(1).getData().getReja();
-
+                    rej = raiz.breadthRejaSearch(rej2).getNode().breadthGanadorSearch(simbolo).getRoute().get(1).getData().getReja();
                 } else {
                     movimientoAleatorioComputadora(simbolo, rej);
                     /*
